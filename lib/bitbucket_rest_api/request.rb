@@ -42,7 +42,9 @@ module BitBucket
       response = conn.send(method) do |request|
         case method.to_sym
         when *(METHODS - METHODS_WITH_BODIES)
-          request.body = params.delete('data') if params.has_key?('data')
+          if params.is_a? Hash
+            request.body = params.delete('data') if params.has_key?('data')
+          end
           request.url(path, params)
         when *METHODS_WITH_BODIES
           request.path = path
