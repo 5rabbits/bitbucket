@@ -70,18 +70,19 @@ module BitBucket
     #  <tt>:reported_by</tt> - Optional - Contains a filter operation to restrict the list of issues by the user that reported the issue
     #
     # = Examples
-    #  bitbucket = BitBucket.new :user => 'user-name', :repo => 'repo-name'
-    #  bitbucket.issues.list_repo :filter => 'kind=bug&kind=enhancement'
+    #  bitbucket = BitBucket.new 'user-name', 'repo-name'
+    #  bitbucket.issues.list_repo 'user-name', 'repo-name', 'kind=bug&kind=enhancement'
     #
     def list_repo(user_name, repo_name, params={ })
       _update_user_repo_params(user_name, repo_name)
       _validate_user_repo_params(user, repo) unless user? && repo?
 
-      normalize! params
-      filter! VALID_ISSUE_PARAM_NAMES, params
-      # _merge_mime_type(:issue, params)
-      assert_valid_values(VALID_ISSUE_PARAM_VALUES, params)
-
+      if params.is_a? Hash
+        normalize! params
+        filter! VALID_ISSUE_PARAM_NAMES, params
+        # _merge_mime_type(:issue, params)
+        assert_valid_values(VALID_ISSUE_PARAM_VALUES, params)
+      end
       response = get_request("/1.0/repositories/#{user}/#{repo.downcase}/issues", params)
       return response.issues unless block_given?
       response.issues.each { |el| yield el }
