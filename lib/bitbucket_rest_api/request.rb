@@ -44,8 +44,10 @@ module BitBucket
         when *(METHODS - METHODS_WITH_BODIES)
           if params.is_a? Hash
             request.body = params.delete('data') if params.has_key?('data')
+            request.url(path, params)
+          else
+            request.url("#{path}?#{params}") 
           end
-          request.url(path, params)
         when *METHODS_WITH_BODIES
           request.path = path
           request.body = extract_data_from_params(params) unless params.empty?
